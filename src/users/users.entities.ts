@@ -1,4 +1,14 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+/**
+ * @author Talha Hasan
+ */
+import {
+  AfterInsert,
+  AfterRemove,
+  AfterUpdate,
+  Column,
+  Entity,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Users {
@@ -37,7 +47,7 @@ export class Users {
 
   @Column({
     name: 'photo',
-    nullable: false,
+    nullable: true,
     default: '',
   })
   photo: string;
@@ -68,4 +78,22 @@ export class Users {
     default: false,
   })
   isDeleted: Boolean;
+
+  /**
+   * Hooks
+   */
+  @AfterInsert()
+  logInsert() {
+    console.log('Inserted User with ID: ', this.id);
+  }
+
+  @AfterUpdate()
+  logUpdate() {
+    console.log('Updated User with ID: ', this.id);
+  }
+
+  @AfterRemove()
+  logRemove() {
+    console.log('Removed User with ID ', this.id);
+  }
 }
