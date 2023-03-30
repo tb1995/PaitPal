@@ -1,12 +1,15 @@
 /**
  * @author Talha Hasan
  */
+import { Restaurants } from '../restaurants/restaurants.entities';
+
 import {
   AfterInsert,
   AfterRemove,
   AfterUpdate,
   Column,
   Entity,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -78,6 +81,12 @@ export class Users {
     default: false,
   })
   isDeleted: Boolean;
+
+  @Column({ type: 'timestamp', nullable: true, default: null })
+  public lastLoginAt: Date | null;
+
+  @OneToMany((type) => Restaurants, (restaurant) => restaurant.user)
+  restaurants: Restaurants[];
 
   /**
    * Hooks

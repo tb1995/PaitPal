@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Users } from '../users/users.entities';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 export class Restaurants {
@@ -76,4 +77,7 @@ export class Restaurants {
     default: false,
   })
   isDeleted: Boolean;
+
+  @ManyToOne((type) => Users, (user) => user.restaurants)
+  user: Users;
 }

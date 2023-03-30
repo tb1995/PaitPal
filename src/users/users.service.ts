@@ -4,10 +4,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Users } from './users.entities';
 import { create } from 'domain';
 import { stringify } from 'querystring';
+import { Request } from 'express';
+import { UpdateUserDto } from './dtos/update-user.dto';
+import { AuthHelper } from './auth/auth.helper';
 
 @Injectable()
 export class UsersService {
-  constructor(@InjectRepository(Users) private repo: Repository<Users>) {}
+  constructor(
+    @InjectRepository(Users) private repo: Repository<Users>,
+
+    private authHelper: AuthHelper
+  ) {}
 
   create(
     email: string,
@@ -38,13 +45,23 @@ export class UsersService {
     return this.repo.find({ where: { username } });
   }
 
-  async update(id: number, attrs: Partial<Users>) {
-    const user = await this.findOne(id);
-    if (!user) {
-      throw new NotFoundException('User not found');
+  async update(body: UpdateUserDto, req: Request) {
+    const user: Users = <Users>req.user;
+    if (body.password) {
+      body.password = this.authHelper.encodePassword(body.password);
     }
-    Object.assign(user, attrs);
+
+    Object.assign(user, body);
+
     return this.repo.save(user);
+
+    // const user = await this.findOne(id);
+    // if (!user) {
+    //   throw new NotFoundException('User not found');
+    // }
+
+    // Object.assign(user, attrs);
+    //  return this.repo.save(user);
   }
 
   async remove(id: number) {
