@@ -13,6 +13,7 @@ import { Restaurants } from './restaurants.entities';
 import { Request, Express } from 'express';
 import { Point } from 'geojson';
 import { Multer } from 'multer';
+import { S3Service } from '@/s3/s3.service';
 
 @Injectable()
 export class RestaurantsService {
@@ -20,7 +21,10 @@ export class RestaurantsService {
   private readonly restaurantRepo: Repository<Restaurants>;
 
   @Inject()
-  userService: UsersService;
+  private userService: UsersService;
+
+  @Inject()
+  private s3Service: S3Service;
 
   create(name: string, longitude: number, latitude: number, req: Request) {
     const user: Users = <Users>req.user;
@@ -66,5 +70,10 @@ export class RestaurantsService {
     const restaurant = await this.findOne(restaurantId);
 
     console.log(restaurant);
+    const key = `${file.filename}${Date.now()}`;
+
+    const imageUrl = await this.s3Service.uploadFile(file, key);
+
+    await this.restaurantRepo.update({ id: restaurantId }, { photo: imageUrl });
   }
 }
